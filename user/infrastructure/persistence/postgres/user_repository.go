@@ -1,18 +1,36 @@
-package persistence
+package postgres
 
 import (
 	"context"
 	"errors"
+	"time"
 
-	"marketgrid/user/internal/domain/model"
+	"marketgrid/user/domain/model"
+	"marketgrid/user/domain/port"
 
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
 
+// gormUser is the persistence model used only in this layer
+// It contains GORM-specific tags and mirrors the database schema.
+type gormUser struct {
+	ID        string    `gorm:"type:uuid;primaryKey;column:id"`
+	Email     string    `gorm:"type:text;uniqueIndex;not null;column:email"`
+	Password  string    `gorm:"type:text;not null;column:password"`
+	CreatedAt time.Time `gorm:"column:created_at"`
+	UpdatedAt time.Time `gorm:"column:updated_at"`
+}
+
+func (gormUser) TableName() string { return "users" }
+
+// PostgresUserRepository implements the UserRepository port using PostgreSQL
 type PostgresUserRepository struct {
 	db *gorm.DB
 }
+
+// Ensure PostgresUserRepository implements the UserRepository interface
+var _ port.UserRepository = (*PostgresUserRepository)(nil)
 
 func NewPostgresUserRepository(dataSourceName string) (*PostgresUserRepository, error) {
 	dial := postgres.Open(dataSourceName)
@@ -63,4 +81,25 @@ func (r *PostgresUserRepository) FindAll(ctx context.Context) ([]*model.User, er
 		result = append(result, toDomain(&us[i]))
 	}
 	return result, nil
+}
+
+// Helper functions for mapping between domain and persistence models
+func toGorm(u *model.User) *gormUser {
+	return &gormUser{
+		ID:        u.ID,
+		Email:     u.Email,
+		Password:  u.Password,
+		CreatedAt: u.CreateAt,
+		UpdatedAt: u.UpdateAt,
+	}
+}
+
+func toDomain(u *gormUser) *model.User {
+	return &model.User{
+		ID:       u.ID,
+		Email:    u.Email,
+		Password: u.Password,
+		CreateAt: u.CreatedAt,
+		UpdateAt: u.UpdatedAt,
+	}
 }

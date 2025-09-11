@@ -1,8 +1,8 @@
 package http
 
 import (
-	"marketgrid/user/internal/application/dto"
-	"marketgrid/user/internal/application/port"
+	"marketgrid/user/app/dto"
+	"marketgrid/user/app/user"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -10,21 +10,20 @@ import (
 )
 
 type UserHandler struct {
-	userService port.UserService
+	userApp *user.UserApp
 }
 
-func NewUserHandler(userService port.UserService) *UserHandler {
+func NewUserHandler(userApp *user.UserApp) *UserHandler {
 	return &UserHandler{
-		userService: userService,
+		userApp: userApp,
 	}
 }
 
 func (h *UserHandler) RegisterRoutes(router *gin.Engine) {
-	v1 := router.Group("/api/v1")
+	v1 := router.Group("/api/v1/user")
 	{
 		v1.POST("/users", h.CreateUser)
 		v1.GET("/users/:id", h.GetUserByID)
-		v1.GET("/users", h.GetAllUsers)
 	}
 }
 
@@ -35,7 +34,7 @@ func (h *UserHandler) CreateUser(c *gin.Context) {
 		return
 	}
 
-	res, err := h.userService.CreateUser(c.Request.Context(), &req)
+	res, err := h.userApp.CreateUser(c.Request.Context(), &req)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -46,7 +45,7 @@ func (h *UserHandler) CreateUser(c *gin.Context) {
 
 func (h *UserHandler) GetAllUsers(c *gin.Context) {
 	if email := c.Query("email"); email != "" {
-		user, err := h.userService.GetUserByEmail(c.Request.Context(), email)
+		user, err := h.userApp.GetUserByEmail(c.Request.Context(), email)
 		if err != nil {
 			if err.Error() == "user not found" {
 				c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
@@ -59,7 +58,7 @@ func (h *UserHandler) GetAllUsers(c *gin.Context) {
 		return
 	}
 
-	users, err := h.userService.GetAllUsers(c.Request.Context())
+	users, err := h.userApp.GetAllUsers(c.Request.Context())
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -74,7 +73,7 @@ func (h *UserHandler) GetUserByID(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid id format"})
 		return
 	}
-	user, err := h.userService.GetUserByID(c.Request.Context(), id)
+	user, err := h.userApp.GetUserByID(c.Request.Context(), id)
 	if err != nil {
 		if err.Error() == "user not found" {
 			c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})

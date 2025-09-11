@@ -1,25 +1,25 @@
-package service
+package user
 
 import (
 	"context"
 	"errors"
-	"marketgrid/user/internal/application/dto"
-	"marketgrid/user/internal/application/port"
-	"marketgrid/user/internal/domain/model"
+	"marketgrid/user/app/dto"
+	"marketgrid/user/domain/model"
+	"marketgrid/user/domain/port"
 )
 
-type userService struct {
+type UserApp struct {
 	userRepo port.UserRepository
 }
 
-func NewUserService(userRepo port.UserRepository) port.UserService {
-	return &userService{
+func NewUserApp(userRepo port.UserRepository) *UserApp {
+	return &UserApp{
 		userRepo: userRepo,
 	}
 }
 
-func (s *userService) CreateUser(ctx context.Context, req *dto.CreateUserRequest) (*dto.UserResponse, error) {
-	if _, err := s.userRepo.FindByEmail(ctx, req.Email); err == nil {
+func (app *UserApp) CreateUser(ctx context.Context, req *dto.CreateUserRequest) (*dto.UserResponse, error) {
+	if _, err := app.userRepo.FindByEmail(ctx, req.Email); err == nil {
 		return nil, errors.New("user with this email already exists")
 	}
 
@@ -28,7 +28,7 @@ func (s *userService) CreateUser(ctx context.Context, req *dto.CreateUserRequest
 		return nil, err
 	}
 
-	if err := s.userRepo.SaveUser(ctx, newUser); err != nil {
+	if err := app.userRepo.SaveUser(ctx, newUser); err != nil {
 		return nil, err
 	}
 
@@ -40,8 +40,8 @@ func (s *userService) CreateUser(ctx context.Context, req *dto.CreateUserRequest
 	}, nil
 }
 
-func (s *userService) GetAllUsers(ctx context.Context) ([]*dto.UserResponse, error) {
-	users, err := s.userRepo.FindAll(ctx)
+func (app *UserApp) GetAllUsers(ctx context.Context) ([]*dto.UserResponse, error) {
+	users, err := app.userRepo.FindAll(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -59,8 +59,8 @@ func (s *userService) GetAllUsers(ctx context.Context) ([]*dto.UserResponse, err
 	return userResponses, nil
 }
 
-func (s *userService) GetUserByID(ctx context.Context, id string) (*dto.UserResponse, error) {
-	user, err := s.userRepo.FindByID(ctx, id)
+func (app *UserApp) GetUserByID(ctx context.Context, id string) (*dto.UserResponse, error) {
+	user, err := app.userRepo.FindByID(ctx, id)
 	if err != nil {
 		return nil, err
 	}
@@ -72,8 +72,8 @@ func (s *userService) GetUserByID(ctx context.Context, id string) (*dto.UserResp
 	}, nil
 }
 
-func (s *userService) GetUserByEmail(ctx context.Context, email string) (*dto.UserResponse, error) {
-	user, err := s.userRepo.FindByEmail(ctx, email)
+func (app *UserApp) GetUserByEmail(ctx context.Context, email string) (*dto.UserResponse, error) {
+	user, err := app.userRepo.FindByEmail(ctx, email)
 	if err != nil {
 		return nil, err
 	}

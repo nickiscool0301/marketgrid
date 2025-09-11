@@ -2,7 +2,7 @@ package port
 
 import (
 	"context"
-	"marketgrid/user/internal/domain/model"
+	"marketgrid/user/domain/model"
 )
 
 type UserRepository interface {
