@@ -4,8 +4,9 @@ import (
 	"context"
 	"fmt"
 	"strings"
+	"time"
 
-	"marketgrid/user/domain/port"
+	"marketgrid/user/internal/domain/port"
 
 	"github.com/redis/go-redis/v9"
 )
@@ -13,6 +14,7 @@ import (
 const (
 	bloomFilterKey = "emails:bloom"
 	cacheKeyPrefix = "email:exists:"
+	emailCacheTTL  = 24 * time.Hour
 )
 
 type RedisEmailExistenceService struct {
@@ -51,7 +53,7 @@ func (s *RedisEmailExistenceService) AddEmail(ctx context.Context, email string)
 	}
 
 	cacheKey := cacheKeyPrefix + normalizedEmail
-	err = s.client.Set(ctx, cacheKey, "1", 0).Err()
+	err = s.client.Set(ctx, cacheKey, "1", emailCacheTTL).Err()
 	if err != nil {
 		return fmt.Errorf("failed to add email to cache: %w", err)
 	}

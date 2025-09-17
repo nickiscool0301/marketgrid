@@ -3,9 +3,9 @@ package user
 import (
 	"context"
 	"errors"
-	"marketgrid/user/app/dto"
-	"marketgrid/user/domain/model"
-	"marketgrid/user/domain/port"
+	"marketgrid/user/internal/app/dto"
+	"marketgrid/user/internal/domain/model"
+	"marketgrid/user/internal/domain/port"
 )
 
 type UserApp struct {
@@ -51,25 +51,6 @@ func (app *UserApp) CreateUser(ctx context.Context, req *dto.CreateUserRequest) 
 		CreateAt: newUser.CreateAt,
 		UpdateAt: newUser.UpdateAt,
 	}, nil
-}
-
-func (app *UserApp) GetAllUsers(ctx context.Context) ([]*dto.UserResponse, error) {
-	users, err := app.userRepo.FindAll(ctx)
-	if err != nil {
-		return nil, err
-	}
-
-	var userResponses []*dto.UserResponse
-	for _, user := range users {
-		userResponses = append(userResponses, &dto.UserResponse{
-			ID:       user.ID,
-			Email:    user.Email,
-			CreateAt: user.CreateAt,
-			UpdateAt: user.UpdateAt,
-		})
-	}
-
-	return userResponses, nil
 }
 
 func (app *UserApp) GetUserByID(ctx context.Context, id string) (*dto.UserResponse, error) {

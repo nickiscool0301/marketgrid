@@ -2,8 +2,8 @@ package admin
 
 import (
 	"context"
-	"marketgrid/user/app/dto"
-	"marketgrid/user/domain/port"
+	"marketgrid/user/internal/app/dto"
+	"marketgrid/user/internal/domain/port"
 )
 
 type AdminApp struct {

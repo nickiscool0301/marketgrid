@@ -5,8 +5,8 @@ import (
 	"errors"
 	"time"
 
-	"marketgrid/user/domain/model"
-	"marketgrid/user/domain/port"
+	"marketgrid/user/internal/domain/model"
+	"marketgrid/user/internal/domain/port"
 
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"

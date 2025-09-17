@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"log"
 
-	"marketgrid/user/domain/port"
+	"marketgrid/user/internal/domain/port"
 )
 
 type EmailSyncService struct {

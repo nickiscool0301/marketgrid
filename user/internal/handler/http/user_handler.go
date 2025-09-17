@@ -1,8 +1,8 @@
 package http
 
 import (
-	"marketgrid/user/app/dto"
-	"marketgrid/user/app/user"
+	"marketgrid/user/internal/app/dto"
+	"marketgrid/user/internal/app/user"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -41,30 +41,6 @@ func (h *UserHandler) CreateUser(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusCreated, res)
-}
-
-func (h *UserHandler) GetAllUsers(c *gin.Context) {
-	if email := c.Query("email"); email != "" {
-		user, err := h.userApp.GetUserByEmail(c.Request.Context(), email)
-		if err != nil {
-			if err.Error() == "user not found" {
-				c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
-				return
-			}
-			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-			return
-		}
-		c.JSON(http.StatusOK, user)
-		return
-	}
-
-	users, err := h.userApp.GetAllUsers(c.Request.Context())
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		return
-	}
-
-	c.JSON(http.StatusOK, users)
 }
 
 func (h *UserHandler) GetUserByID(c *gin.Context) {

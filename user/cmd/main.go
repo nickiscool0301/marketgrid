@@ -3,12 +3,12 @@ package main
 import (
 	"context"
 	"log"
-	"marketgrid/user/app/admin"
-	"marketgrid/user/app/user"
-	"marketgrid/user/config"
-	"marketgrid/user/handler/http"
-	"marketgrid/user/infrastructure/persistence/postgres"
-	"marketgrid/user/infrastructure/redis"
+	"marketgrid/user/internal/app/admin"
+	"marketgrid/user/internal/app/user"
+	"marketgrid/user/internal/config"
+	"marketgrid/user/internal/handler/http"
+	"marketgrid/user/internal/infrastructure/persistence/postgres"
+	"marketgrid/user/internal/infrastructure/redis"
 
 	"github.com/gin-gonic/gin"
 )

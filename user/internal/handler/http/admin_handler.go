@@ -1,7 +1,7 @@
 package http
 
 import (
-	"marketgrid/user/app/admin"
+	"marketgrid/user/internal/app/admin"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
