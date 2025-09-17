@@ -9,17 +9,24 @@ import (
 )
 
 type UserApp struct {
-	userRepo port.UserRepository
+	userRepo              port.UserRepository
+	emailExistenceService port.EmailExistenceService
 }
 
-func NewUserApp(userRepo port.UserRepository) *UserApp {
+func NewUserApp(userRepo port.UserRepository, emailExistenceService port.EmailExistenceService) *UserApp {
 	return &UserApp{
-		userRepo: userRepo,
+		userRepo:              userRepo,
+		emailExistenceService: emailExistenceService,
 	}
 }
 
 func (app *UserApp) CreateUser(ctx context.Context, req *dto.CreateUserRequest) (*dto.UserResponse, error) {
-	if _, err := app.userRepo.FindByEmail(ctx, req.Email); err == nil {
+	exists, err := app.emailExistenceService.EmailExists(ctx, req.Email)
+	if err != nil {
+		if _, dbErr := app.userRepo.FindByEmail(ctx, req.Email); dbErr == nil {
+			return nil, errors.New("user with this email already exists")
+		}
+	} else if exists {
 		return nil, errors.New("user with this email already exists")
 	}
 
@@ -30,6 +37,12 @@ func (app *UserApp) CreateUser(ctx context.Context, req *dto.CreateUserRequest) 
 
 	if err := app.userRepo.SaveUser(ctx, newUser); err != nil {
 		return nil, err
+	}
+
+	// Add email to existence service after successful creation
+	if addErr := app.emailExistenceService.AddEmail(ctx, req.Email); addErr != nil {
+		// Log error but don't fail the request since user was created successfully
+		// In production, you might want to use a proper logger here
 	}
 
 	return &dto.UserResponse{

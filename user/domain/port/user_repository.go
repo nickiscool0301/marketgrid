@@ -10,4 +10,5 @@ type UserRepository interface {
 	FindByEmail(ctx context.Context, email string) (*model.User, error)
 	FindByID(ctx context.Context, id string) (*model.User, error)
 	FindAll(ctx context.Context) ([]*model.User, error)
+	GetAllEmails(ctx context.Context) ([]string, error)
 }

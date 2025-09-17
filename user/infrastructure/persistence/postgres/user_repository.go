@@ -83,6 +83,14 @@ func (r *PostgresUserRepository) FindAll(ctx context.Context) ([]*model.User, er
 	return result, nil
 }
 
+func (r *PostgresUserRepository) GetAllEmails(ctx context.Context) ([]string, error) {
+	var emails []string
+	if err := r.db.WithContext(ctx).Model(&gormUser{}).Pluck("email", &emails).Error; err != nil {
+		return nil, err
+	}
+	return emails, nil
+}
+
 // Helper functions for mapping between domain and persistence models
 func toGorm(u *model.User) *gormUser {
 	return &gormUser{
